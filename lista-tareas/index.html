@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Cliente de Supabase (la librería que nos permite hablar con la base de datos) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         /* 1. SISTEMA DE DISEÑO */
         :root {
@@ -275,7 +278,7 @@
 
     <div class="app-card">
         <h1>Mis Tareas</h1>
-        <p class="desc">Tus datos se guardan automáticamente en tu navegador</p>
+        <p class="desc">Tus datos se guardan en la ☁️ nube (Supabase)</p>
 
         <div class="input-group">
             <input type="text" id="todoInput" class="todo-input" placeholder="¿Qué tienes pendiente hoy?" autocomplete="off">
@@ -288,96 +291,140 @@
     </div>
 
     <script>
+        // ============================================================
+        // CONFIGURACIÓN DE SUPABASE
+        // Estas son las "llaves" para conectar con la base de datos
+        // ============================================================
+        const SUPABASE_URL  = 'https://gmqsdhywvlmanzuvasle.supabase.co';
+        const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtcXNkaHl3dmxtYW56dXZhc2xlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyOTcxMDYsImV4cCI6MjA5Nzg3MzEwNn0.I_lq5qPJaZ7APLNLcY3eYwLcJvp-M0rUKo8gaaGyeuM';
+        const supabase      = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // Referencias a elementos HTML
         const todoInput = document.getElementById('todoInput');
-        const addBtn = document.getElementById('addBtn');
-        const todoList = document.getElementById('todoList');
+        const addBtn    = document.getElementById('addBtn');
+        const todoList  = document.getElementById('todoList');
 
-        // 1. CARGAR TAREAS AL INICIAR
-        // Intentamos leer del "cajón de almacenamiento" (localStorage).
-        // Si no hay nada, inicializamos con una lista vacía [].
-        let tasks = JSON.parse(localStorage.getItem('my_tasks')) || [];
+        // ============================================================
+        // 1. CARGAR TAREAS AL INICIAR (desde Supabase, no localStorage)
+        // ============================================================
+        async function loadTasks() {
+            setLoading(true);
+            // Le pedimos a Supabase todas las filas de la tabla "tareas"
+            // ordenadas de más antigua a más nueva
+            const { data, error } = await supabase
+                .from('tareas')
+                .select('*')
+                .order('created_at', { ascending: true });
 
-        // Función para renderizar (dibujar) las tareas en la pantalla
-        function renderTasks() {
-            todoList.innerHTML = ''; // Limpiamos la lista actual
+            if (error) {
+                console.error('Error cargando tareas:', error);
+                return;
+            }
+            renderTasks(data);
+            setLoading(false);
+        }
 
-            if (tasks.length === 0) {
+        // ============================================================
+        // 2. DIBUJAR LAS TAREAS EN PANTALLA
+        // ============================================================
+        function renderTasks(tasks) {
+            todoList.innerHTML = '';
+
+            if (!tasks || tasks.length === 0) {
                 todoList.innerHTML = '<li class="empty-state">No tienes tareas pendientes. ¡Buen trabajo!</li>';
                 return;
             }
 
-            tasks.forEach((task, index) => {
-                // Creamos el elemento <li> de la tarea
+            tasks.forEach(task => {
                 const li = document.createElement('li');
-                li.className = `todo-item ${task.completed ? 'completed' : ''}`;
+                li.className = `todo-item ${task.completada ? 'completed' : ''}`;
+                // Guardamos el ID de Supabase en el elemento para usarlo luego
+                li.dataset.id = task.id;
 
                 li.innerHTML = `
-                    <div class="todo-content" onclick="toggleTask(${index})">
-                        <input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''}>
-                        <span class="todo-text">${escapeHTML(task.text)}</span>
+                    <div class="todo-content" onclick="toggleTask('${task.id}', ${task.completada})">
+                        <input type="checkbox" class="todo-checkbox" ${task.completada ? 'checked' : ''}>
+                        <span class="todo-text">${escapeHTML(task.texto)}</span>
                     </div>
-                    <button class="delete-btn" onclick="deleteTask(event, ${index})">✕</button>
+                    <button class="delete-btn" onclick="deleteTask(event, '${task.id}')">✕</button>
                 `;
-
                 todoList.appendChild(li);
             });
         }
 
-        // 2. FUNCIÓN PARA AÑADIR UNA NUEVA TAREA
-        function addTask() {
+        // ============================================================
+        // 3. AÑADIR UNA NUEVA TAREA (INSERT en Supabase)
+        // ============================================================
+        async function addTask() {
             const text = todoInput.value.trim();
-            if (text === '') return; // Evitamos añadir tareas vacías
+            if (text === '') return;
 
-            // Añadimos el nuevo objeto de tarea al array
-            tasks.push({
-                text: text,
-                completed: false
-            });
+            addBtn.disabled = true;
+            // Insertamos una nueva fila en la tabla "tareas"
+            const { error } = await supabase
+                .from('tareas')
+                .insert({ texto: text, completada: false });
 
-            todoInput.value = ''; // Limpiamos el input
-            saveAndRender();
+            if (error) {
+                console.error('Error añadiendo tarea:', error);
+            } else {
+                todoInput.value = '';
+                await loadTasks(); // Recargamos la lista desde Supabase
+            }
+            addBtn.disabled = false;
         }
 
-        // 3. FUNCIÓN PARA MARCAR/DESMARCAR TAREA
-        window.toggleTask = function(index) {
-            tasks[index].completed = !tasks[index].completed;
-            saveAndRender();
+        // ============================================================
+        // 4. MARCAR/DESMARCAR TAREA (UPDATE en Supabase)
+        // ============================================================
+        window.toggleTask = async function(id, currentState) {
+            // Actualizamos la fila con el ID correspondiente
+            const { error } = await supabase
+                .from('tareas')
+                .update({ completada: !currentState })
+                .eq('id', id); // "eq" significa "where id = id"
+
+            if (error) console.error('Error actualizando tarea:', error);
+            else await loadTasks();
         }
 
-        // 4. FUNCIÓN PARA BORRAR UNA TAREA
-        window.deleteTask = function(event, index) {
-            event.stopPropagation(); // Evita que se active el clic del contenedor
-            tasks.splice(index, 1); // Eliminamos la tarea del array
-            saveAndRender();
-        }
+        // ============================================================
+        // 5. BORRAR UNA TAREA (DELETE en Supabase)
+        // ============================================================
+        window.deleteTask = async function(event, id) {
+            event.stopPropagation();
+            // Eliminamos la fila con ese ID de la base de datos
+            const { error } = await supabase
+                .from('tareas')
+                .delete()
+                .eq('id', id);
 
-        // 5. GUARDAR EN LOCALSTORAGE Y RENDERIZAR
-        function saveAndRender() {
-            // Guardamos el array convertido a texto en localStorage
-            localStorage.setItem('my_tasks', JSON.stringify(tasks));
-            renderTasks();
+            if (error) console.error('Error borrando tarea:', error);
+            else await loadTasks();
         }
 
         // Seguridad: Evitar inyección de código malicioso
         function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
+            return str.replace(/[&<>'"]/g,
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
             );
         }
 
-        // 6. EVENTOS DE ESCUCHA
-        addBtn.addEventListener('click', addTask);
-
-        // Permitir añadir tareas al presionar la tecla Enter
-        todoInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addTask();
+        // Muestra/oculta un indicador de carga
+        function setLoading(isLoading) {
+            if (isLoading) {
+                todoList.innerHTML = '<li class="empty-state">Conectando con la nube... ⏳</li>';
             }
+        }
+
+        // Eventos de escucha
+        addBtn.addEventListener('click', addTask);
+        todoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addTask();
         });
 
-        // Inicializamos la pantalla dibujando las tareas guardadas
-        renderTasks();
+        // Cargamos las tareas al abrir la página
+        loadTasks();
     </script>
 </body>
 </html>
