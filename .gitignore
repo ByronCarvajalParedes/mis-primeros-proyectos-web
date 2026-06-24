@@ -1,0 +1,9 @@
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE and system configurations
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Sabiduría y Perritos (APIs)</title>
+    
+    <!-- Fuente moderna -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* 1. SISTEMA DE DISEÑO */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #a855f7;
+            --accent-hover: #c084fc;
+        }
+
+        /* 2. ESTILOS BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Elementos decorativos en el fondo */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+            top: 10%;
+            right: 5%;
+            filter: blur(40px);
+            z-index: 0;
+        }
+
+        /* 3. TARJETA PRINCIPAL */
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffffff, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        /* 4. CONTENEDOR DE LA IMAGEN (Perrito) */
+        .image-container {
+            width: 100%;
+            height: 250px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .dog-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s ease;
+            opacity: 0; /* Empieza invisible para la transición */
+        }
+
+        .dog-image.loaded {
+            opacity: 1;
+        }
+
+        /* Indicador de carga (Spinner) */
+        .spinner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* 5. SECCIÓN DEL CONSEJO (Texto) */
+        .advice-box {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .advice-text {
+            font-size: 1.15rem;
+            font-style: italic;
+            line-height: 1.5;
+            color: #e2e8f0;
+            font-weight: 300;
+            transition: opacity 0.3s ease;
+        }
+
+        /* 6. BOTÓN */
+        .btn {
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.5);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Spinner de carga */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Sabiduría & Perritos</h1>
+        <p class="desc">Esta página web se conecta en tiempo real a dos servidores en internet usando APIs públicas.</p>
+
+        <div class="image-container">
+            <div id="spinner" class="spinner"></div>
+            <img id="dogImg" class="dog-image" alt="Perrito aleatorio">
+        </div>
+
+        <div class="advice-box">
+            <p id="adviceText" class="advice-text">Cargando sabiduría...</p>
+        </div>
+
+        <button id="fetchBtn" class="btn">¡Traer nueva combinación!</button>
+    </div>
+
+    <script>
+        const dogImg = document.getElementById('dogImg');
+        const spinner = document.getElementById('spinner');
+        const adviceText = document.getElementById('adviceText');
+        const fetchBtn = document.getElementById('fetchBtn');
+
+        // FUNCIÓN PARA CONSULTAR LAS APIs (Servidores Externos)
+        async function getNewData() {
+            // Mostrar estados de carga
+            spinner.style.display = 'block';
+            dogImg.classList.remove('loaded');
+            adviceText.style.opacity = '0.3';
+            adviceText.textContent = 'Consultando a los servidores...';
+            fetchBtn.disabled = true;
+
+            try {
+                // 1. Llamar a la API de consejos (Advice Slip API)
+                // Usamos "fetch" para hacer una petición web en segundo plano
+                const adviceResponse = await fetch('https://api.adviceslip.com/advice');
+                const adviceData = await adviceResponse.json();
+                
+                // Traducir dinámicamente o mostrar (los consejos vienen en inglés de la API pública)
+                const advice = adviceData.slip.advice;
+
+                // 2. Llamar a la API de fotos de perritos (Dog CEO API)
+                const dogResponse = await fetch('https://dog.ceo/api/breeds/image/random');
+                const dogData = await dogResponse.json();
+                const dogUrl = dogData.message;
+
+                // Actualizar la interfaz
+                adviceText.textContent = `"${advice}"`;
+                adviceText.style.opacity = '1';
+                
+                dogImg.src = dogUrl;
+                
+                // Esperar a que la imagen se descargue del todo para mostrarla con suavidad
+                dogImg.onload = () => {
+                    spinner.style.display = 'none';
+                    dogImg.classList.add('loaded');
+                };
+
+            } catch (error) {
+                console.error('Error al consultar las APIs:', error);
+                adviceText.textContent = '¡Vaya! Hubo un problema al conectar con los servidores.';
+                spinner.style.display = 'none';
+            } finally {
+                fetchBtn.disabled = false;
+            }
+        }
+
+        // Cargar datos por primera vez al abrir la página
+        getNewData();
+
+        // Escuchar el clic del botón para traer una nueva combinación
+        fetchBtn.addEventListener('click', getNewData);
+    </script>
+</body>
+</html>

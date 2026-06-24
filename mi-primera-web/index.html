@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Mi Primera Página Web!</title>
+    
+    <!-- Fuente moderna desde Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* 1. SISTEMA DE DISEÑO & VARIABLES */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #a855f7;
+            --accent-secondary: #ec4899;
+            --glow-color: rgba(168, 85, 247, 0.4);
+        }
+
+        /* 2. ESTILOS GENERALES (RESET & BASE) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Elementos decorativos de fondo */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.5;
+        }
+        body::before {
+            background: var(--accent-primary);
+            top: 20%;
+            left: 15%;
+            animation: float-slow 12s infinite alternate;
+        }
+        body::after {
+            background: var(--accent-secondary);
+            bottom: 20%;
+            right: 15%;
+            animation: float-slow 8s infinite alternate-reverse;
+        }
+
+        /* 3. CONTENEDOR PRINCIPAL (TARJETA GLASSMORPHISM) */
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 550px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(168, 85, 247, 0.15);
+        }
+
+        /* 4. TIPOGRAFÍA Y TEXTOS */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #ffffff, #e2e8f0, var(--accent-primary), var(--accent-secondary));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* Sección de interacción */
+        .interactive-zone {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quote-text {
+            font-size: 1.25rem;
+            font-style: italic;
+            font-weight: 300;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .quote-author {
+            font-size: 0.9rem;
+            color: var(--accent-primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: opacity 0.3s ease;
+        }
+
+        /* 5. BOTÓN INTERACTIVO */
+        .btn {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            color: #ffffff;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--glow-color);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            outline: none;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px var(--glow-color);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Footer decorativo */
+        .footer {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 6. ANIMACIONES */
+        @keyframes float-slow {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-30px) scale(1.1); }
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* Clase de transición al cambiar de cita */
+        .fade-out {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>¡Hola Mundo!</h1>
+        <p class="subtitle">Esta es tu primera página web. Fue creada combinando estructura (HTML), diseño (CSS) e interactividad (JavaScript).</p>
+        
+        <div class="interactive-zone">
+            <div id="quote" class="quote-text">Haz clic en el botón para descubrir un gran consejo del mundo de la programación.</div>
+            <div id="author" class="quote-author"></div>
+        </div>
+
+        <button class="btn" id="actionBtn">¡Generar inspiración!</button>
+
+        <div class="footer">
+            Creado con ❤️ y Antigravity en tu IDE
+        </div>
+    </div>
+
+    <!-- 7. LÓGICA JAVASCRIPT -->
+    <script>
+        // Array de citas sobre programación y tecnología
+        const quotes = [
+            {
+                text: "La mejor manera de predecir el futuro es inventarlo.",
+                author: "Alan Kay"
+            },
+            {
+                text: "Los ordenadores son buenos siguiendo instrucciones, no leyendo tu mente.",
+                author: "Donald Knuth"
+            },
+            {
+                text: "No te preocupes si no funciona bien. Si todo lo hiciera, no tendrías trabajo.",
+                author: "Ley de Mosher"
+            },
+            {
+                text: "Primero, resuelve el problema. Entonces, escribe el código.",
+                author: "John Johnson"
+            },
+            {
+                text: "La simplicidad es la clave de la brillantez.",
+                author: "Bruce Lee (aplicado al código)"
+            },
+            {
+                text: "Hazlo simple, tan simple como sea posible, pero no más.",
+                author: "Albert Einstein"
+            }
+        ];
+
+        const quoteEl = document.getElementById('quote');
+        const authorEl = document.getElementById('author');
+        const btnEl = document.getElementById('actionBtn');
+
+        // Función para cambiar de cita con una suave animación
+        function getRandomQuote() {
+            // Añadimos clase para desvanecer el texto anterior
+            quoteEl.classList.add('fade-out');
+            authorEl.classList.add('fade-out');
+
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                const randomQuote = quotes[randomIndex];
+
+                quoteEl.textContent = `"${randomQuote.text}"`;
+                authorEl.textContent = randomQuote.author;
+
+                // Quitamos la clase para que aparezca el nuevo texto con animación
+                quoteEl.classList.remove('fade-out');
+                authorEl.classList.remove('fade-out');
+            }, 300);
+        }
+
+        // Escuchar el clic del botón
+        btnEl.addEventListener('click', getRandomQuote);
+    </script>
+</body>
+</html>

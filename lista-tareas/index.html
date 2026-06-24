@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Lista de Tareas Premium</title>
+    
+    <!-- Fuente moderna desde Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* 1. SISTEMA DE DISEÑO */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #090d16 0%, #111827 50%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #a855f7;
+            --accent-hover: #c084fc;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        /* 2. RESET Y ESTILOS BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Decoración de fondo */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(168,85,247,0.3) 0%, transparent 70%);
+            top: 15%;
+            left: 10%;
+            filter: blur(50px);
+            z-index: 0;
+        }
+
+        /* 3. CONTENEDOR PRINCIPAL */
+        .app-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px;
+            padding: 35px 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #ffffff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* 4. FORMULARIO DE ENTRADA */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .todo-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+            padding: 14px 20px;
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .todo-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+        }
+
+        .todo-input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .add-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 22px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-btn:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        .add-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 5. LISTA DE TAREAS */
+        .todo-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Estilo de la barra de scroll */
+        .todo-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .todo-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 14px 18px;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            animation: slide-in 0.3s ease forwards;
+        }
+
+        .todo-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(2px);
+        }
+
+        /* Contenedor del checkbox y texto */
+        .todo-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Checkbox oculto y custom */
+        .todo-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .todo-checkbox:checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .todo-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -55%);
+        }
+
+        .todo-text {
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        /* Estilo tachado para tarea completada */
+        .completed .todo-text {
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        /* Botón de borrar */
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Si no hay tareas */
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.95rem;
+            font-style: italic;
+        }
+
+        /* 6. ANIMACIONES */
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-card">
+        <h1>Mis Tareas</h1>
+        <p class="desc">Tus datos se guardan automáticamente en tu navegador</p>
+
+        <div class="input-group">
+            <input type="text" id="todoInput" class="todo-input" placeholder="¿Qué tienes pendiente hoy?" autocomplete="off">
+            <button id="addBtn" class="add-btn">Añadir</button>
+        </div>
+
+        <ul id="todoList" class="todo-list">
+            <!-- Las tareas se insertarán aquí dinámicamente -->
+        </ul>
+    </div>
+
+    <script>
+        // Referencias a elementos HTML
+        const todoInput = document.getElementById('todoInput');
+        const addBtn = document.getElementById('addBtn');
+        const todoList = document.getElementById('todoList');
+
+        // 1. CARGAR TAREAS AL INICIAR
+        // Intentamos leer del "cajón de almacenamiento" (localStorage).
+        // Si no hay nada, inicializamos con una lista vacía [].
+        let tasks = JSON.parse(localStorage.getItem('my_tasks')) || [];
+
+        // Función para renderizar (dibujar) las tareas en la pantalla
+        function renderTasks() {
+            todoList.innerHTML = ''; // Limpiamos la lista actual
+
+            if (tasks.length === 0) {
+                todoList.innerHTML = '<li class="empty-state">No tienes tareas pendientes. ¡Buen trabajo!</li>';
+                return;
+            }
+
+            tasks.forEach((task, index) => {
+                // Creamos el elemento <li> de la tarea
+                const li = document.createElement('li');
+                li.className = `todo-item ${task.completed ? 'completed' : ''}`;
+
+                li.innerHTML = `
+                    <div class="todo-content" onclick="toggleTask(${index})">
+                        <input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''}>
+                        <span class="todo-text">${escapeHTML(task.text)}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(event, ${index})">✕</button>
+                `;
+
+                todoList.appendChild(li);
+            });
+        }
+
+        // 2. FUNCIÓN PARA AÑADIR UNA NUEVA TAREA
+        function addTask() {
+            const text = todoInput.value.trim();
+            if (text === '') return; // Evitamos añadir tareas vacías
+
+            // Añadimos el nuevo objeto de tarea al array
+            tasks.push({
+                text: text,
+                completed: false
+            });
+
+            todoInput.value = ''; // Limpiamos el input
+            saveAndRender();
+        }
+
+        // 3. FUNCIÓN PARA MARCAR/DESMARCAR TAREA
+        window.toggleTask = function(index) {
+            tasks[index].completed = !tasks[index].completed;
+            saveAndRender();
+        }
+
+        // 4. FUNCIÓN PARA BORRAR UNA TAREA
+        window.deleteTask = function(event, index) {
+            event.stopPropagation(); // Evita que se active el clic del contenedor
+            tasks.splice(index, 1); // Eliminamos la tarea del array
+            saveAndRender();
+        }
+
+        // 5. GUARDAR EN LOCALSTORAGE Y RENDERIZAR
+        function saveAndRender() {
+            // Guardamos el array convertido a texto en localStorage
+            localStorage.setItem('my_tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        // Seguridad: Evitar inyección de código malicioso
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // 6. EVENTOS DE ESCUCHA
+        addBtn.addEventListener('click', addTask);
+
+        // Permitir añadir tareas al presionar la tecla Enter
+        todoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        // Inicializamos la pantalla dibujando las tareas guardadas
+        renderTasks();
+    </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarjeta de Presentación - Byron</title>
+    
+    <!-- Fuente moderna -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* 1. TEMA OSCURO (Por defecto) */
+        :root {
+            --bg-color: #0b0f19;
+            --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #a855f7;
+            --accent-light: #c084fc;
+            --shadow: rgba(0, 0, 0, 0.4);
+            --toggle-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 2. TEMA CLARO */
+        /* Al añadir la clase .light-theme al body, estas variables sobreescriben a las anteriores */
+        body.light-theme {
+            --bg-color: #f1f5f9;
+            --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent: #7c3aed;
+            --accent-light: #8b5cf6;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --toggle-bg: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 3. ESTILOS BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 4. BOTÓN CAMBIADOR DE TEMA (INTERRUPTOR) */
+        .theme-toggle-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .theme-toggle-btn {
+            background: var(--toggle-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.03);
+        }
+
+        /* 5. TARJETA DE PRESENTACIÓN */
+        .profile-card {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px var(--shadow);
+            position: relative;
+        }
+
+        /* Avatar del programador (usando un SVG moderno integrado) */
+        .avatar-container {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            margin: 0 auto 20px auto;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            padding: 4px;
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.2);
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* SVG del Avatar de Byron */
+        .avatar svg {
+            width: 70px;
+            height: 70px;
+            fill: var(--accent);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 18px;
+        }
+
+        .bio {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* 6. ENLACES / REDES SOCIALES */
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .social-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            transition: all 0.2s ease;
+        }
+
+        .social-btn:hover {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Botón interruptor de tema -->
+    <div class="theme-toggle-container">
+        <button id="themeToggle" class="theme-toggle-btn">
+            <span id="themeIcon">🌙</span> <span id="themeText">Modo Oscuro</span>
+        </button>
+    </div>
+
+    <!-- Tarjeta de presentación -->
+    <div class="profile-card">
+        <div class="avatar-container">
+            <div class="avatar">
+                <!-- Avatar vectorial moderno (un programador con auriculares/gafas) -->
+                <svg viewBox="0 0 24 24">
+                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,16 20,18V20H4V18C4,16 7.58,14 12,14Z" />
+                </svg>
+            </div>
+        </div>
+
+        <h2>Byron</h2>
+        <div class="title">Desarrollador Web Frontend</div>
+        
+        <p class="bio">
+            ¡Hola! Estoy aprendiendo a programar y a crear productos digitales modernos desde mi IDE. Me apasiona el diseño limpio, la interactividad y descubrir cómo funciona internet.
+        </p>
+
+        <div class="social-links">
+            <a href="https://byronsprimeraweb.netlify.app/" target="_blank" class="social-btn">✨ Ver Mi Primera Web</a>
+            <a href="#" class="social-btn">💼 Mi Portafolio (Próximamente)</a>
+            <a href="mailto:byron@ejemplo.com" class="social-btn">📧 Contactar conmigo</a>
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        const body = document.body;
+
+        // 1. CARGAR PREFERENCIA DE TEMA (Uniendo conceptos con LocalStorage)
+        const savedTheme = localStorage.getItem('theme_preference');
+
+        if (savedTheme === 'light') {
+            body.classList.add('light-theme');
+            updateToggleUI(true);
+        }
+
+        // 2. FUNCIÓN AL HACER CLIC EN EL INTERRUPTOR
+        themeToggle.addEventListener('click', () => {
+            // Toggles (activa/desactiva) la clase en el body
+            body.classList.toggle('light-theme');
+            
+            const isLightTheme = body.classList.contains('light-theme');
+            
+            // Guardamos la decisión en localStorage para que Chrome la recuerde
+            localStorage.setItem('theme_preference', isLightTheme ? 'light' : 'dark');
+            
+            updateToggleUI(isLightTheme);
+        });
+
+        // Función para actualizar los iconos y textos del botón
+        function updateToggleUI(isLight) {
+            if (isLight) {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Modo Claro';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Modo Oscuro';
+            }
+        }
+    </script>
+</body>
+</html>
